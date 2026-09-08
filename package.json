@@ -1,0 +1,27 @@
+{
+  "name": "e-research-root",
+  "version": "1.0.0",
+  "description": "ShopEase Full Stack E-Commerce Platform Workspace Root",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix Ecommerce run dev",
+    "live": "node start_continuous.js",
+    "live:stop": "node stop_continuous.js",
+    "start": "npm --prefix Ecommerce run start",
+    "backend": "npm --prefix Ecommerce run backend",
+    "frontend": "npm --prefix Ecommerce run frontend",
+    "build": "npm --prefix Ecommerce run build"
+  },
+  "keywords": [
+    "ecommerce",
+    "react",
+    "springboot",
+    "java",
+    "mysql"
+  ],
+  "author": "ShopEase Team",
+  "license": "ISC",
+  "devDependencies": {
+    "localtunnel": "^2.0.2"
+  }
+}

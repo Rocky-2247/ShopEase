@@ -1,0 +1,10 @@
+ECOMMERCE APPLICATION 
+
+user side application
+admin side application
+backend server
+
+tech stack
+    frontend:react +Typescript+tailwind
+    backend:java+springboot+
+    database:mysql

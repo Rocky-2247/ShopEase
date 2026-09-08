@@ -1,0 +1,10 @@
+node_modules/
+target/
+*.jar
+*.war
+.env
+.env.*
+database.sqlite
+database_h2.mv.db
+uploads/
+.mvn/

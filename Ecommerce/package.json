@@ -1,0 +1,27 @@
+{
+  "name": "shopease-ecommerce-root",
+  "version": "1.0.0",
+  "description": "ShopEase Full Stack E-Commerce Web Application (React + Spring Boot 3.3.x)",
+  "scripts": {
+    "dev": "concurrently -n \"SPRING-BOOT,FRONTEND\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
+    "start": "concurrently -n \"SPRING-BOOT,FRONTEND\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
+    "backend": "npm --prefix backend run dev",
+    "backend:win": "npm --prefix backend run dev:win",
+    "frontend": "npm --prefix frontend run dev",
+    "seed": "npm --prefix backend run seed",
+    "build": "npm --prefix frontend run build"
+  },
+  "keywords": [
+    "ecommerce",
+    "fullstack",
+    "react",
+    "springboot",
+    "java",
+    "mysql"
+  ],
+  "author": "ShopEase Team",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
