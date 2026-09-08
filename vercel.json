@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd Ecommerce/frontend && npm install && npm run build",
+  "outputDirectory": "Ecommerce/frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
