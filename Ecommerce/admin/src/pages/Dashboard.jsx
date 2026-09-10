@@ -30,13 +30,13 @@ import {
   Cell,
   CartesianGrid
 } from 'recharts';
-import { adminAPI, productsAPI } from '../../services/api';
-import { Loader } from '../../components/common/Loader';
-import { OrderStatusBadge } from '../../components/common/Badge';
-import { formatPrice } from '../../utils/currency';
-import { useToast } from '../../context/ToastContext';
+import { adminAPI, productsAPI } from '../services/api';
+import { Loader } from '../components/common/Loader';
+import { OrderStatusBadge } from '../components/common/Badge';
+import { formatPrice } from '../utils/currency';
+import { useToast } from '../context/ToastContext';
 
-export const AdminDashboard = () => {
+export const Dashboard = () => {
   const { showToast } = useToast();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -130,7 +130,7 @@ export const AdminDashboard = () => {
             <span>Refresh</span>
           </button>
           <Link
-            to="/admin/analytics"
+            to="/analytics"
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/25"
           >
             <BarChart3 className="w-3.5 h-3.5" />
@@ -211,7 +211,7 @@ export const AdminDashboard = () => {
               <h3 className="text-base font-extrabold text-white">Monthly Sales Revenue Flow (₹)</h3>
               <p className="text-xs text-slate-400">Aggregated revenue performance over the last 6 months</p>
             </div>
-            <Link to="/admin/analytics" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+            <Link to="/analytics" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
               <span>View Report</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
@@ -298,7 +298,7 @@ export const AdminDashboard = () => {
               <AlertTriangle className="w-4 h-4 text-amber-400" />
               Low Stock Warnings (&le;10 units)
             </h3>
-            <Link to="/admin/products" className="text-xs font-bold text-indigo-400 hover:underline">
+            <Link to="/products" className="text-xs font-bold text-indigo-400 hover:underline">
               Manage All
             </Link>
           </div>
@@ -344,7 +344,7 @@ export const AdminDashboard = () => {
         <div className="lg:col-span-7 bg-slate-900/90 p-6 rounded-3xl border border-slate-800/90 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-extrabold text-white">Recent Customer Orders</h3>
-            <Link to="/admin/orders" className="text-xs font-bold text-indigo-400 hover:underline">
+            <Link to="/orders" className="text-xs font-bold text-indigo-400 hover:underline">
               View All Orders &rarr;
             </Link>
           </div>
@@ -371,7 +371,7 @@ export const AdminDashboard = () => {
                     </td>
                     <td className="py-3 text-right">
                       <Link
-                        to={`/admin/orders`}
+                        to={`/orders`}
                         className="text-xs font-bold text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1"
                       >
                         <Eye className="w-3.5 h-3.5" />

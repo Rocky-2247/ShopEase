@@ -54,9 +54,9 @@ async function main() {
     console.log('   ℹ️ Backend is already active on Port 5000.');
   }
 
-  // 2. Start Frontend if not already listening on port 3000
+  // 2. Start Customer Frontend if not already listening on port 3000
   if (!(await isPortListening(3000))) {
-    console.log('🔹 Launching Frontend UI (Port 3000)...');
+    console.log('🔹 Launching Customer Storefront UI (Port 3000)...');
     const frontendLog = fs.openSync(path.join(logsDir, 'frontend.log'), 'a');
     const viteBin = path.join(__dirname, 'Ecommerce', 'frontend', 'node_modules', 'vite', 'bin', 'vite.js');
     const frontendProc = spawn(process.execPath, [viteBin, '--host', '--port', '3000'], {
@@ -67,12 +67,34 @@ async function main() {
     frontendProc.unref();
     pids.frontend = frontendProc.pid;
     const ok = await waitForPort(3000);
-    console.log(`   ${ok ? '✅' : '⚠️'} Frontend status: Port 3000 ${ok ? 'ONLINE' : 'WAITING'} (PID: ${frontendProc.pid})`);
+    console.log(`   ${ok ? '✅' : '⚠️'} Customer Store status: Port 3000 ${ok ? 'ONLINE' : 'WAITING'} (PID: ${frontendProc.pid})`);
   } else {
-    console.log('   ℹ️ Frontend is already active on Port 3000.');
+    console.log('   ℹ️ Customer Store is already active on Port 3000.');
   }
 
-  // 3. Start Cloudflare Tunnel
+  // 3. Start Standalone Admin Application if not already listening on port 3001
+  if (!(await isPortListening(3001))) {
+    console.log('🔹 Launching Standalone Admin Web Application (Port 3001)...');
+    const adminLog = fs.openSync(path.join(logsDir, 'admin.log'), 'a');
+    const viteBinAdmin = path.join(__dirname, 'Ecommerce', 'admin', 'node_modules', 'vite', 'bin', 'vite.js');
+    if (fs.existsSync(viteBinAdmin)) {
+      const adminProc = spawn(process.execPath, [viteBinAdmin, '--host', '--port', '3001'], {
+        cwd: path.join(__dirname, 'Ecommerce', 'admin'),
+        detached: true,
+        stdio: ['ignore', adminLog, adminLog]
+      });
+      adminProc.unref();
+      pids.admin = adminProc.pid;
+      const ok = await waitForPort(3001);
+      console.log(`   ${ok ? '✅' : '⚠️'} Admin Application status: Port 3001 ${ok ? 'ONLINE' : 'WAITING'} (PID: ${adminProc.pid})`);
+    } else {
+      console.log('   ℹ️ Admin node_modules initializing...');
+    }
+  } else {
+    console.log('   ℹ️ Admin Application is already active on Port 3001.');
+  }
+
+  // 4. Start Cloudflare Tunnel
   console.log('🔹 Launching Cloudflare Live Tunnel (trycloudflare.com)...');
   const tunnelLogPath = path.join(logsDir, 'tunnel.log');
   const tunnelLog = fs.openSync(tunnelLogPath, 'w');
@@ -105,20 +127,14 @@ async function main() {
   }
 
   console.log('\n========================================================');
-  console.log('🎉 All Services Are Running Continuously in Background!');
-  console.log('========================================================');
-  console.log('Even if you close this terminal or press Ctrl+C, the');
-  console.log('services will STAY ALIVE and NEVER TERMINATE.\n');
+  console.log('🎉 All 3 Micro-Services Are Running in Background!');
+  console.log('========================================================\n');
+  console.log('🛍️ Customer Store:       http://localhost:3000');
+  console.log('🛡️ Standalone Admin App: http://localhost:3001');
+  console.log('🚀 Backend REST API:     http://localhost:5000');
   if (tunnelUrl) {
-    console.log('🌐 Direct Live Public Web Link (No password / No warning screen):');
-    console.log('   ' + tunnelUrl);
-  } else {
-    console.log('🌐 Public Tunnel is initializing. Check .service_logs/tunnel.log');
+    console.log('\n🌐 Live Storefront Link: ' + tunnelUrl);
   }
-  console.log('\n📱 Local Wi-Fi Network Link (Instant, zero-lag on your Wi-Fi):');
-  console.log('   http://192.168.0.9:3000');
-  console.log('\n💻 Localhost URL:');
-  console.log('   http://localhost:3000');
   console.log('========================================================\n');
 }
 

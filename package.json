@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm --prefix Ecommerce run dev",
+    "admin": "npm --prefix Ecommerce run admin",
     "live": "node start_continuous.js",
     "live:stop": "node stop_continuous.js",
     "start": "npm --prefix Ecommerce run start",

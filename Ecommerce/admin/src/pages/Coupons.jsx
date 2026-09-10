@@ -4,23 +4,17 @@ import {
   Plus,
   Edit2,
   Trash2,
-  Percent,
-  Calendar,
-  DollarSign,
-  CheckCircle2,
-  XCircle,
+  Copy,
   X,
   AlertCircle,
-  Copy,
-  Sparkles,
   Zap
 } from 'lucide-react';
-import { adminAPI } from '../../services/api';
-import { Loader } from '../../components/common/Loader';
-import { useToast } from '../../context/ToastContext';
-import { formatPrice } from '../../utils/currency';
+import { adminAPI } from '../services/api';
+import { Loader } from '../components/common/Loader';
+import { useToast } from '../context/ToastContext';
+import { formatPrice } from '../utils/currency';
 
-export const AdminCoupons = () => {
+export const Coupons = () => {
   const { showToast } = useToast();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +54,7 @@ export const AdminCoupons = () => {
   const handleGenerateCode = () => {
     const prefixes = ['SAVE', 'FLASH', 'DEAL', 'SUPER', 'SUMMER', 'VIP', 'OFFER'];
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const num = Math.floor(Math.random() * 8 + 2) * 5; // 10, 15, 20, 25, 30...
+    const num = Math.floor(Math.random() * 8 + 2) * 5;
     setFormData((prev) => ({
       ...prev,
       code: `${prefix}${num}`,

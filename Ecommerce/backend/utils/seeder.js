@@ -71,70 +71,70 @@ export const seedDatabase = async (force = false) => {
         name: 'Electronics & Tech',
         slug: 'electronics',
         description: 'Laptops, flagship smartphones, noise-cancelling audio, tablets, and smart gadgets',
-        image_url: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1200&q=80',
         item_count: 5
       },
       {
         name: 'Fashion & Apparel',
         slug: 'fashion-apparel',
         description: 'Designer streetwear, premium denim, formal blazers, footwear, and leather bags',
-        image_url: 'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80',
         item_count: 4
       },
       {
         name: 'Home & Living',
         slug: 'home-living',
         description: 'Minimalist furniture, ceramic tableware, ambient smart lighting, and kitchenware',
-        image_url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
         item_count: 3
       },
       {
         name: 'Beauty & Skincare',
         slug: 'beauty-care',
         description: 'Clean skincare, botanical serums, luxury fragrances, and salon hair care',
-        image_url: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=80',
         item_count: 4
       },
       {
         name: 'Sports & Fitness',
         slug: 'sports-outdoors',
         description: 'Performance activewear, ergonomic yoga mats, smart dumbbells, and camping gear',
-        image_url: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80',
         item_count: 3
       },
       {
         name: 'Books & Stationery',
         slug: 'books-stationery',
         description: 'Bestselling hardcovers, leather journals, fountain pens, and artistic supplies',
-        image_url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=80',
         item_count: 3
       },
       {
         name: 'Gaming & Consoles',
         slug: 'gaming-consoles',
         description: 'Next-gen consoles, mechanical keyboards, gaming headsets, and ergonomic chairs',
-        image_url: 'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80',
         item_count: 3
       },
       {
         name: 'Watches & Jewelry',
         slug: 'watches-jewelry',
         description: 'Precision chronograph timepieces, sterling silver, gold pendants, and smart rings',
-        image_url: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80',
         item_count: 3
       },
       {
         name: 'Health & Wellness',
         slug: 'health-wellness',
         description: 'Organic dietary supplements, herbal teas, massage guns, and posture correctors',
-        image_url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80',
         item_count: 3
       },
       {
         name: 'Groceries & Gourmet',
         slug: 'groceries-gourmet',
         description: 'Artisanal roasted coffee beans, organic matcha, cold-pressed olive oils, and snacks',
-        image_url: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80',
+        image_url: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80',
         item_count: 3
       }
     ];

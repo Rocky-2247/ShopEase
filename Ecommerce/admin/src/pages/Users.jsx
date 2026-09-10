@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Users,
+  Users as UsersIcon,
   Search,
   ShieldCheck,
   UserX,
@@ -13,17 +13,16 @@ import {
   Award,
   AlertCircle
 } from 'lucide-react';
-import { adminAPI } from '../../services/api';
-import { Loader } from '../../components/common/Loader';
-import { useToast } from '../../context/ToastContext';
+import { adminAPI } from '../services/api';
+import { Loader } from '../components/common/Loader';
+import { useToast } from '../context/ToastContext';
 
-export const AdminUsers = () => {
+export const Users = () => {
   const { showToast } = useToast();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('all');
-  const [inspectUser, setInspectUser] = useState(null);
 
   const loadUsers = async () => {
     try {
@@ -80,7 +79,7 @@ export const AdminUsers = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <Users className="w-7 h-7 text-indigo-400" />
+            <UsersIcon className="w-7 h-7 text-indigo-400" />
             Customer Accounts & Security
           </h1>
           <p className="text-xs text-slate-400 mt-1">

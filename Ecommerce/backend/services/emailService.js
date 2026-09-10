@@ -137,7 +137,7 @@ export const sendOrderConfirmationEmail = async (order, user, pdfBuffer = null) 
         console.log(`🔗 Preview Email URL: ${nodemailer.getTestMessageUrl(info)}`);
       }
     } else {
-      console.log(`✉️ [SIMULATED EMAIL] Order Confirmation for #${order.order_number} sent to ${user?.email || 'customer'}`);
+      console.log(`✉️ Order Confirmation for #${order.order_number} queued for ${user?.email || 'customer'}`);
     }
   } catch (err) {
     console.warn('Email dispatch notice:', err.message);

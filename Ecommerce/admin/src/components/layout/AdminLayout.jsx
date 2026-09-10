@@ -15,10 +15,6 @@ import {
   Menu,
   X,
   Plus,
-  Bell,
-  Sparkles,
-  Database,
-  CheckCircle2,
   ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -31,14 +27,14 @@ export const AdminLayout = () => {
   const [quickActionOpen, setQuickActionOpen] = useState(false);
 
   const navItems = [
-    { label: 'Overview', path: '/admin', icon: LayoutDashboard, exact: true },
-    { label: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
-    { label: 'Products', path: '/admin/products', icon: Package, badge: '1.6k+' },
-    { label: 'Categories', path: '/admin/categories', icon: Layers },
-    { label: 'Orders', path: '/admin/orders', icon: ShoppingBag },
-    { label: 'Customers', path: '/admin/users', icon: Users },
-    { label: 'Coupons', path: '/admin/coupons', icon: Tag, badge: 'Active' },
-    { label: 'Settings', path: '/admin/settings', icon: Settings },
+    { label: 'Overview', path: '/', icon: LayoutDashboard, exact: true },
+    { label: 'Analytics', path: '/analytics', icon: BarChart3 },
+    { label: 'Products', path: '/products', icon: Package, badge: '1.6k+' },
+    { label: 'Categories', path: '/categories', icon: Layers },
+    { label: 'Orders', path: '/orders', icon: ShoppingBag },
+    { label: 'Customers', path: '/users', icon: Users },
+    { label: 'Coupons', path: '/coupons', icon: Tag, badge: 'Active' },
+    { label: 'Settings', path: '/settings', icon: Settings },
   ];
 
   const getPageTitle = () => {
@@ -73,7 +69,7 @@ export const AdminLayout = () => {
           {/* Admin Header / Logo */}
           <div className="flex items-center justify-between">
             <Link
-              to="/admin"
+              to="/"
               className="flex items-center gap-3 group"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -86,11 +82,11 @@ export const AdminLayout = () => {
                     Shop<span className="text-indigo-400">Ease</span>
                   </span>
                   <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                    Pro
+                    Admin
                   </span>
                 </div>
                 <span className="text-[10px] block font-bold uppercase tracking-widest text-slate-400">
-                  Enterprise Admin
+                  Control Hub (Port 3001)
                 </span>
               </div>
             </Link>
@@ -106,7 +102,7 @@ export const AdminLayout = () => {
           {/* Navigation Links */}
           <div className="space-y-1">
             <p className="px-3 text-[11px] font-black uppercase tracking-wider text-slate-500 pb-1">
-              Management Menu
+              Management Portal
             </p>
             <nav className="space-y-1">
               {navItems.map((item) => {
@@ -151,17 +147,18 @@ export const AdminLayout = () => {
 
         {/* Footer info & live link */}
         <div className="pt-5 border-t border-slate-800/80 space-y-3">
-          <Link
-            to="/"
+          <a
+            href="http://localhost:3000"
             target="_blank"
+            rel="noreferrer"
             className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-xs font-bold text-slate-300 hover:text-white transition-all border border-slate-700/50 group"
           >
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Live Storefront</span>
+              <span>Open Store (Port 3000)</span>
             </div>
             <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-400 transition-colors" />
-          </Link>
+          </a>
 
           <div className="flex items-center justify-between px-2 pt-1">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -199,7 +196,7 @@ export const AdminLayout = () => {
               <Menu className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-slate-400 font-medium">Admin</span>
+              <span className="text-slate-400 font-medium">ShopEase Admin</span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
               <span className="font-extrabold text-white">{getPageTitle()}</span>
             </div>
@@ -209,7 +206,7 @@ export const AdminLayout = () => {
             {/* System Status Pill */}
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-[11px] font-semibold text-slate-300">
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span>MySQL 8.0 &bull; 1,672 SKUs Active</span>
+              <span>MySQL 8.0 &bull; Port 5000 Online</span>
             </div>
 
             {/* Quick Actions Dropdown */}
@@ -232,7 +229,7 @@ export const AdminLayout = () => {
                     <button
                       onClick={() => {
                         setQuickActionOpen(false);
-                        navigate('/admin/products');
+                        navigate('/products');
                       }}
                       className="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
                     >
@@ -242,7 +239,7 @@ export const AdminLayout = () => {
                     <button
                       onClick={() => {
                         setQuickActionOpen(false);
-                        navigate('/admin/categories');
+                        navigate('/categories');
                       }}
                       className="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
                     >
@@ -252,7 +249,7 @@ export const AdminLayout = () => {
                     <button
                       onClick={() => {
                         setQuickActionOpen(false);
-                        navigate('/admin/coupons');
+                        navigate('/coupons');
                       }}
                       className="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
                     >
@@ -266,7 +263,7 @@ export const AdminLayout = () => {
           </div>
         </header>
 
-        {/* Main Body */}
+        {/* Main Content Area */}
         <main className="flex-1 p-4 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>

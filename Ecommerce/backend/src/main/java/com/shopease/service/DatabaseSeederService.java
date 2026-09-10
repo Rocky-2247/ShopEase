@@ -74,11 +74,16 @@ public class DatabaseSeederService implements CommandLineRunner {
 
     private void seedCategories() {
         if (categoryRepository.count() == 0) {
-            createCategory("Electronics & Tech", "electronics-tech", "Smartphones, laptops, smart audio and premium gadgets", "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800", 6);
-            createCategory("Fashion & Apparel", "fashion-apparel", "Designer streetwear, footwear and seasonal luxury collections", "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800", 5);
-            createCategory("Sports & Activewear", "sports-activewear", "Professional athletic apparel, running shoes and gear", "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800", 4);
-            createCategory("Home & Living", "home-living", "Modern smart appliances, luxury decor and air purifiers", "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800", 3);
-            createCategory("Luxury Watches & Jewelry", "luxury-watches", "Certified heritage chronometers and luxury timepieces", "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800", 3);
+            createCategory("Electronics & Tech", "electronics", "Laptops, flagship smartphones, noise-cancelling audio, tablets, and smart gadgets", "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1200&q=80", 6);
+            createCategory("Fashion & Apparel", "fashion-apparel", "Designer streetwear, premium denim, formal blazers, footwear, and leather bags", "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80", 5);
+            createCategory("Home & Living", "home-living", "Minimalist furniture, ceramic tableware, ambient smart lighting, and kitchenware", "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80", 4);
+            createCategory("Beauty & Skincare", "beauty-care", "Clean skincare, botanical serums, luxury fragrances, and salon hair care", "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=80", 4);
+            createCategory("Sports & Fitness", "sports-outdoors", "Performance activewear, ergonomic yoga mats, smart dumbbells, and camping gear", "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80", 4);
+            createCategory("Books & Stationery", "books-stationery", "Bestselling hardcovers, leather journals, fountain pens, and artistic supplies", "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=80", 4);
+            createCategory("Gaming & Consoles", "gaming-consoles", "Next-gen consoles, mechanical keyboards, gaming headsets, and ergonomic chairs", "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80", 4);
+            createCategory("Watches & Jewelry", "watches-jewelry", "Precision chronograph timepieces, sterling silver, gold pendants, and smart rings", "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80", 4);
+            createCategory("Health & Wellness", "health-wellness", "Organic dietary supplements, herbal teas, massage guns, and posture correctors", "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80", 3);
+            createCategory("Groceries & Gourmet", "groceries-gourmet", "Artisanal roasted coffee beans, organic matcha, cold-pressed olive oils, and snacks", "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80", 4);
         }
     }
 

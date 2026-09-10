@@ -28,6 +28,7 @@ import { ProductCard } from '../components/product/ProductCard';
 import { ProductCardSkeleton } from '../components/common/Loader';
 import { BrandMarquee } from '../components/common/BrandMarquee';
 import { useToast } from '../context/ToastContext';
+import { getDepartmentMeta } from '../utils/departmentData';
 
 export const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -512,7 +513,63 @@ export const Products = () => {
         </aside>
 
         {/* Main Product Grid & Pagination */}
-        <div className="lg:col-span-3 space-y-8">
+        <div className="lg:col-span-3 space-y-6">
+          {/* Active Category Department Banner */}
+          {category && (() => {
+            const activeCatObj = categories.find(c => c.slug === category);
+            const deptMeta = getDepartmentMeta(category);
+            const deptBanner = activeCatObj?.imageUrl || activeCatObj?.image_url || deptMeta.banner;
+            const deptName = activeCatObj?.name || deptMeta.name;
+            const deptDesc = activeCatObj?.description || deptMeta.tagline;
+
+            return (
+              <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-xl text-white">
+                <div className="relative h-44 sm:h-52 w-full overflow-hidden">
+                  <img
+                    src={deptBanner}
+                    alt={deptName}
+                    className="w-full h-full object-cover opacity-60"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+                  
+                  <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600/90 backdrop-blur-md text-white font-black text-xs uppercase tracking-wider">
+                        <Sparkles className="w-3.5 h-3.5" /> Commercial Department
+                      </span>
+                      <button
+                        onClick={() => updateParam('category', '')}
+                        className="px-3 py-1 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white rounded-full text-xs font-bold border border-slate-700 backdrop-blur-sm transition-all flex items-center gap-1 cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" /> All Categories
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <h2 className="text-2xl sm:text-3xl font-black text-white">{deptName}</h2>
+                      <p className="text-xs sm:text-sm text-slate-200 max-w-2xl line-clamp-2">
+                        {deptDesc}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                        <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider mr-1">
+                          Inside:
+                        </span>
+                        {(deptMeta.insideHighlights || []).map((tag, i) => (
+                          <span
+                            key={i}
+                            className="text-[10px] font-semibold bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-2 py-0.5 rounded-full transition-colors"
+                          >
+                            • {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {Array(6).fill(0).map((_, i) => (

@@ -4,25 +4,23 @@ import {
   Search,
   Edit2,
   Trash2,
-  Image as ImageIcon,
   Upload,
   X,
   Sparkles,
   AlertCircle,
   Download,
-  Filter,
   Package,
   Layers,
   CheckCircle2,
   TrendingUp,
   Tag
 } from 'lucide-react';
-import { productsAPI, categoriesAPI, uploadAPI } from '../../services/api';
-import { Loader } from '../../components/common/Loader';
-import { useToast } from '../../context/ToastContext';
-import { formatPrice } from '../../utils/currency';
+import { productsAPI, categoriesAPI, uploadAPI } from '../services/api';
+import { Loader } from '../components/common/Loader';
+import { useToast } from '../context/ToastContext';
+import { formatPrice } from '../utils/currency';
 
-export const AdminProducts = () => {
+export const Products = () => {
   const { showToast } = useToast();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);

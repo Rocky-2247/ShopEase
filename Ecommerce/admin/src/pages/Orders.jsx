@@ -18,13 +18,13 @@ import {
   ExternalLink,
   ChevronRight
 } from 'lucide-react';
-import { ordersAPI, downloadInvoiceFile } from '../../services/api';
-import { Loader } from '../../components/common/Loader';
-import { OrderStatusBadge } from '../../components/common/Badge';
-import { useToast } from '../../context/ToastContext';
-import { formatPrice } from '../../utils/currency';
+import { ordersAPI, downloadInvoiceFile } from '../services/api';
+import { Loader } from '../components/common/Loader';
+import { OrderStatusBadge } from '../components/common/Badge';
+import { useToast } from '../context/ToastContext';
+import { formatPrice } from '../utils/currency';
 
-export const AdminOrders = () => {
+export const Orders = () => {
   const { showToast } = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,7 +74,6 @@ export const AdminOrders = () => {
       await ordersAPI.updateStatus(orderId, { order_status: newStatus });
       showToast(`Order #${orderId} status updated to ${newStatus}`, 'success');
       
-      // Update locally
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, order_status: newStatus } : o))
       );

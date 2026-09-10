@@ -6,18 +6,16 @@ import {
   Layers,
   X,
   Upload,
-  Image as ImageIcon,
   Grid,
   List,
   Package,
-  AlertCircle,
-  ExternalLink
+  AlertCircle
 } from 'lucide-react';
-import { categoriesAPI, uploadAPI } from '../../services/api';
-import { Loader } from '../../components/common/Loader';
-import { useToast } from '../../context/ToastContext';
+import { categoriesAPI, uploadAPI } from '../services/api';
+import { Loader } from '../components/common/Loader';
+import { useToast } from '../context/ToastContext';
 
-export const AdminCategories = () => {
+export const Categories = () => {
   const { showToast } = useToast();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);

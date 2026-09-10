@@ -1,6 +1,7 @@
 {
   "name": "shopease-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "ShopEase E-Commerce REST API Backend (Spring Boot 3.3.x + Java 21)",
   "scripts": {
     "start": "mvnw.cmd spring-boot:run",

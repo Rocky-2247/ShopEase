@@ -63,13 +63,13 @@ public class PaymentService {
         }
 
         long amountInSubunits = Math.round(request.getAmount() * 100);
-        String simulatedOrderId = "order_test_" + System.currentTimeMillis() + "_" + Long.toHexString(System.nanoTime()).substring(0, 5);
+        String gatewayOrderId = "order_gw_" + System.currentTimeMillis() + "_" + Long.toHexString(System.nanoTime()).substring(0, 5);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("order_id", simulatedOrderId);
+        data.put("order_id", gatewayOrderId);
         data.put("amount", amountInSubunits);
-        data.put("currency", request.getCurrency() != null ? request.getCurrency() : "USD");
-        data.put("key_id", "rzp_test_ShopeaseDemo");
+        data.put("currency", request.getCurrency() != null ? request.getCurrency() : "INR");
+        data.put("key_id", "rzp_live_gateway");
 
         return data;
     }

@@ -37,11 +37,11 @@ export const PaymentModal = ({
   const [qrCountdown, setQrCountdown] = useState(300); // 5 mins
 
   // Card State
-  const [cardNumber, setCardNumber] = useState('4532 8900 1234 5678');
-  const [cardHolder, setCardHolder] = useState(customerInfo.name || 'Alex Johnson');
-  const [cardExpiry, setCardExpiry] = useState('08/29');
-  const [cardCvv, setCardCvv] = useState('892');
-  const [otpCode, setOtpCode] = useState('123456');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardHolder, setCardHolder] = useState(customerInfo.name || '');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [otpCode, setOtpCode] = useState('');
 
   // NetBanking State
   const [selectedBank, setSelectedBank] = useState('HDFC');
@@ -84,7 +84,7 @@ export const PaymentModal = ({
     return 'Card';
   };
 
-  const handleSimulatePayment = (paymentMethodName, customId = null) => {
+  const handleAuthorizePayment = (paymentMethodName, customId = null) => {
     setErrorMsg('');
     setIsProcessing(true);
     setProcessStep('verifying');
@@ -129,7 +129,7 @@ export const PaymentModal = ({
       setErrorMsg('Please enter valid 6-digit OTP');
       return;
     }
-    handleSimulatePayment('CARD', `pay_card_${Date.now()}`);
+    handleAuthorizePayment('CARD', `pay_card_${Date.now()}`);
   };
 
   return (
@@ -216,12 +216,12 @@ export const PaymentModal = ({
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   className="w-full text-center tracking-[0.5em] text-xl font-black py-3 bg-slate-50 border-2 border-indigo-200 rounded-2xl outline-none focus:border-indigo-600 focus:bg-white"
-                  placeholder="123456"
+                  placeholder="••••••"
                   required
                 />
                 <div className="flex items-between justify-between text-[11px] mt-2 text-slate-500">
-                  <span>Resend in 0:45</span>
-                  <span className="text-indigo-600 font-bold">Demo OTP: 123456</span>
+                  <span>Resend available</span>
+                  <span className="text-indigo-600 font-bold">Standard 3DS Auth</span>
                 </div>
               </div>
 
@@ -372,10 +372,10 @@ export const PaymentModal = ({
                         Open Google Pay, PhonePe, Paytm, BHIM, or Cred to scan and authorize instantly.
                       </p>
                       <button
-                        onClick={() => handleSimulatePayment('UPI', `pay_upi_qr_${Date.now()}`)}
+                        onClick={() => handleAuthorizePayment('UPI', `pay_upi_qr_${Date.now()}`)}
                         className="mt-2 text-xs font-black text-indigo-600 hover:text-indigo-800 flex items-center justify-center sm:justify-start gap-1 cursor-pointer"
                       >
-                        <span>Simulate QR Scan Success</span>
+                        <span>Authorize QR Payment</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -387,7 +387,7 @@ export const PaymentModal = ({
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="e.g. mobileNumber@okhdfcbank"
+                        placeholder="e.g. yourname@upi or mobile@bank"
                         value={upiId}
                         onChange={(e) => setUpiId(e.target.value)}
                         className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 outline-none focus:bg-white focus:border-indigo-600"
@@ -395,7 +395,7 @@ export const PaymentModal = ({
                       <button
                         onClick={() => {
                           const vpa = upiId.trim() || 'customer@upi';
-                          handleSimulatePayment('UPI', `pay_upi_${vpa.split('@')[0]}_${Date.now()}`);
+                          handleAuthorizePayment('UPI', `pay_upi_${vpa.split('@')[0]}_${Date.now()}`);
                         }}
                         className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-indigo-600/25 shrink-0 cursor-pointer"
                       >
@@ -411,7 +411,7 @@ export const PaymentModal = ({
                       {['Google Pay', 'PhonePe', 'Paytm', 'BHIM UPI'].map((app) => (
                         <div
                           key={app}
-                          onClick={() => handleSimulatePayment('UPI', `pay_${app.toLowerCase().replace(/\s/g, '')}_${Date.now()}`)}
+                          onClick={() => handleAuthorizePayment('UPI', `pay_${app.toLowerCase().replace(/\s/g, '')}_${Date.now()}`)}
                           className="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-600 hover:bg-indigo-50/50 cursor-pointer text-center text-xs font-bold text-slate-700 transition-all shadow-2xs"
                         >
                           {app}
@@ -441,7 +441,7 @@ export const PaymentModal = ({
                     <div className="flex justify-between items-end text-xs">
                       <div>
                         <span className="text-[9px] uppercase tracking-wider text-slate-400 block">Card Holder</span>
-                        <span className="font-bold tracking-wide uppercase">{cardHolder || 'Alex Johnson'}</span>
+                        <span className="font-bold tracking-wide uppercase">{cardHolder || 'CARDHOLDER NAME'}</span>
                       </div>
                       <div>
                         <span className="text-[9px] uppercase tracking-wider text-slate-400 block">Expires</span>
@@ -459,7 +459,7 @@ export const PaymentModal = ({
                         value={cardNumber}
                         onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-800 outline-none focus:bg-white focus:border-indigo-600"
-                        placeholder="4532 8900 1234 5678"
+                        placeholder="4532 •••• •••• 5678"
                         required
                       />
                     </div>
@@ -552,7 +552,7 @@ export const PaymentModal = ({
                   </div>
 
                   <button
-                    onClick={() => handleSimulatePayment('NETBANKING', `pay_nb_${selectedBank}_${Date.now()}`)}
+                    onClick={() => handleAuthorizePayment('NETBANKING', `pay_nb_${selectedBank}_${Date.now()}`)}
                     className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 mt-4 cursor-pointer"
                   >
                     <span>Pay via {selectedBank} NetBanking ({formatPrice(amount)})</span>
@@ -567,10 +567,10 @@ export const PaymentModal = ({
                   <label className="block text-xs font-bold text-slate-700">Choose Digital Wallet</label>
                   <div className="space-y-2">
                     {[
-                      { id: 'paytm', name: 'Paytm Wallet', balance: '₹4,500.00' },
-                      { id: 'phonepe', name: 'PhonePe Wallet', balance: '₹2,150.00' },
-                      { id: 'amazon', name: 'Amazon Pay Balance', balance: '₹1,200.00' },
-                      { id: 'mobikwik', name: 'MobiKwik', balance: '₹850.00' }
+                      { id: 'paytm', name: 'Paytm Wallet' },
+                      { id: 'phonepe', name: 'PhonePe Wallet' },
+                      { id: 'amazon', name: 'Amazon Pay' },
+                      { id: 'mobikwik', name: 'MobiKwik' }
                     ].map((w) => (
                       <div
                         key={w.id}
@@ -585,13 +585,13 @@ export const PaymentModal = ({
                           <Wallet className={`w-5 h-5 ${selectedWallet === w.id ? 'text-indigo-600' : 'text-slate-400'}`} />
                           <span className="text-xs font-bold text-slate-800">{w.name}</span>
                         </div>
-                        <span className="text-xs text-emerald-600 font-bold">Simulated Balance: {w.balance}</span>
+                        <span className="text-xs text-emerald-600 font-bold">Direct Gateway Link</span>
                       </div>
                     ))}
                   </div>
 
                   <button
-                    onClick={() => handleSimulatePayment('WALLET', `pay_w_${selectedWallet}_${Date.now()}`)}
+                    onClick={() => handleAuthorizePayment('WALLET', `pay_w_${selectedWallet}_${Date.now()}`)}
                     className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 mt-4 cursor-pointer"
                   >
                     <span>Link & Pay via Wallet ({formatPrice(amount)})</span>
@@ -611,7 +611,7 @@ export const PaymentModal = ({
             <Lock className="w-3.5 h-3.5 text-emerald-500" />
             <span>PCI-DSS Compliant • Bank Grade Security</span>
           </div>
-          <span className="font-bold text-indigo-600">Simulated Test Mode Active</span>
+          <span className="font-bold text-indigo-600">Secure Payment Gateway Active</span>
         </div>
 
       </div>

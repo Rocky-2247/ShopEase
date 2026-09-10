@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "ShopEase Full Stack E-Commerce Web Application (React + Spring Boot 3.3.x)",
   "scripts": {
-    "dev": "concurrently -n \"SPRING-BOOT,FRONTEND\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
-    "start": "concurrently -n \"SPRING-BOOT,FRONTEND\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
+    "dev": "concurrently -n \"BACKEND,FRONTEND,ADMIN\" -c \"blue,green,magenta\" \"npm run backend\" \"npm run frontend\" \"npm run admin\"",
+    "start": "concurrently -n \"BACKEND,FRONTEND,ADMIN\" -c \"blue,green,magenta\" \"npm run backend\" \"npm run frontend\" \"npm run admin\"",
     "backend": "npm --prefix backend run dev",
     "backend:win": "npm --prefix backend run dev:win",
     "frontend": "npm --prefix frontend run dev",
+    "admin": "npm --prefix admin run dev",
     "seed": "npm --prefix backend run seed",
-    "build": "npm --prefix frontend run build"
+    "build": "npm --prefix frontend run build && npm --prefix admin run build",
+    "build:admin": "npm --prefix admin run build",
+    "build:frontend": "npm --prefix frontend run build"
   },
   "keywords": [
     "ecommerce",

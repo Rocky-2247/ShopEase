@@ -31,6 +31,7 @@ import {
 import { productsAPI, categoriesAPI } from '../services/api';
 import { ProductCard } from '../components/product/ProductCard';
 import { ProductCardSkeleton } from '../components/common/Loader';
+import { DepartmentShowcase } from '../components/home/DepartmentShowcase';
 import { BrandMarquee } from '../components/common/BrandMarquee';
 import { BrandSpotlightAd } from '../components/common/BrandSpotlightAd';
 import { AllBrandsShowcase } from '../components/common/AllBrandsShowcase';
@@ -248,146 +249,63 @@ export const Home = () => {
       {/* 4. Dedicated Brand Partner Spotlight Showcase (Samsung Galaxy AI) */}
       <BrandSpotlightAd />
 
-      {/* 5. Comprehensive 10-Department Category Showcase */}
+      {/* 5. Comprehensive 10-Department Category Showcase with Photo Previews */}
+      <DepartmentShowcase categories={categories} getCategoryIcon={getCategoryIcon} />
+
+      {/* Category Spotlight Dual-Banner with Inside Product Teasers */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">
-              <Layers className="w-4 h-4" />
-              <span>Curated Departments</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              Explore Popular Categories
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Discover handpicked collections across {categories.length || '10'} specialized shopping departments
-            </p>
-          </div>
-          <Link
-            to="/products"
-            className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 group self-start md:self-auto"
-          >
-            <span>Browse Full Catalog</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-
-        {/* Category Filter Pills Ribbon */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar">
-          <button
-            onClick={() => setActiveCategoryTab('all')}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold shrink-0 transition-all ${
-              activeCategoryTab === 'all'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            All Departments ({categories.length})
-          </button>
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/products?category=${cat.slug}`}
-              className="px-3.5 py-2 rounded-2xl text-xs font-semibold shrink-0 bg-white hover:bg-indigo-50/50 text-slate-700 border border-slate-200/80 hover:border-indigo-200 transition-all flex items-center gap-2 group shadow-sm"
-            >
-              {getCategoryIcon(cat.slug)}
-              <span>{cat.name}</span>
-              <span className="text-[10px] text-slate-400 bg-slate-100 group-hover:bg-indigo-100 group-hover:text-indigo-700 px-1.5 py-0.5 rounded-full font-bold">
-                {cat.item_count || 0}
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        {/* 10-Department Visual Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/products?category=${cat.slug}`}
-              className="group relative bg-white rounded-3xl p-4 border border-slate-100 shadow-sm hover:shadow-2xl hover:border-indigo-300 hover:-translate-y-1 transition-all duration-300 text-center flex flex-col items-center justify-between overflow-hidden"
-            >
-              {/* Category Image Box */}
-              <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-100 mb-3.5 shadow-inner">
-                <img
-                  src={cat.image_url}
-                  alt={cat.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                />
-                
-                {/* Gradient Overlay & Badge */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-3">
-                  <span className="text-[11px] font-extrabold text-white flex items-center gap-1">
-                    Shop Now <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-
-                <div className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm">
-                  {cat.item_count || 0} Items
-                </div>
-              </div>
-
-              {/* Category Info */}
-              <div className="space-y-1 w-full">
-                <div className="flex items-center justify-center gap-1.5 text-indigo-600 mb-0.5">
-                  {getCategoryIcon(cat.slug)}
-                </div>
-                <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
-                  {cat.name}
-                </h3>
-                <p className="text-[11px] text-slate-400 font-medium line-clamp-1">
-                  {cat.description || 'Explore collection'}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Category Spotlight Dual-Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 flex items-center justify-between shadow-xl border border-slate-800">
-            <div className="space-y-2 max-w-xs z-10">
-              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300 bg-indigo-900/60 px-2.5 py-1 rounded-full border border-indigo-700/60">
-                Flagship Tech
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 flex items-center justify-between shadow-xl border border-slate-800 group">
+            <div className="space-y-2.5 max-w-xs z-10">
+              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300 bg-indigo-900/80 px-2.5 py-1 rounded-full border border-indigo-700/60 inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-indigo-400" /> Flagship Tech Department
               </span>
               <h4 className="text-xl sm:text-2xl font-black">Next-Gen Audio & Laptops</h4>
-              <p className="text-xs text-slate-300">Spatial audio, OLED watches, and M3 Max silicon with up to 30% discount.</p>
-              <Link
-                to="/products?category=electronics"
-                className="inline-flex items-center gap-2 pt-2 text-xs font-bold text-indigo-300 hover:text-white"
-              >
-                <span>Shop Electronics</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Featuring Samsung S24 Ultra, iPhone 16 Pro Max, Sony WH-1000XM5, and M3 Max silicon with express dispatch.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <Link
+                  to="/products?category=electronics"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-600/30"
+                >
+                  <span>Explore Tech Inside</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
-            <div className="w-28 sm:w-36 aspect-square rounded-2xl overflow-hidden shrink-0 shadow-lg border-2 border-white/20">
+            <div className="w-28 sm:w-36 aspect-square rounded-2xl overflow-hidden shrink-0 shadow-xl border-2 border-white/20 group-hover:scale-105 transition-transform duration-500">
               <img
-                src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
-                alt="Electronics"
+                src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=600&q=80"
+                alt="Electronics Department"
                 className="w-full h-full object-cover"
               />
             </div>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-pink-950 via-rose-900 to-purple-950 text-white p-6 sm:p-8 flex items-center justify-between shadow-xl border border-rose-800/40">
-            <div className="space-y-2 max-w-xs z-10">
-              <span className="text-[10px] font-black uppercase tracking-widest text-rose-300 bg-rose-950/60 px-2.5 py-1 rounded-full border border-rose-700/60">
-                Designer Fashion
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-pink-950 via-rose-900 to-purple-950 text-white p-6 sm:p-8 flex items-center justify-between shadow-xl border border-rose-800/40 group">
+            <div className="space-y-2.5 max-w-xs z-10">
+              <span className="text-[10px] font-black uppercase tracking-widest text-rose-300 bg-rose-950/80 px-2.5 py-1 rounded-full border border-rose-700/60 inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-rose-400" /> Designer Apparel Department
               </span>
-              <h4 className="text-xl sm:text-2xl font-black">Curated Summer Wear</h4>
-              <p className="text-xs text-rose-100">Handcrafted Tuscan leather bags, Japanese denim, and tailored blazers.</p>
-              <Link
-                to="/products?category=fashion-apparel"
-                className="inline-flex items-center gap-2 pt-2 text-xs font-bold text-rose-300 hover:text-white"
-              >
-                <span>Shop Fashion</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <h4 className="text-xl sm:text-2xl font-black">Curated Designer Wardrobe</h4>
+              <p className="text-xs text-rose-100 leading-relaxed">
+                Handcrafted Tuscan leather bags, 100% Merino knitwear, Japanese denim, and Italian leather sneakers.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <Link
+                  to="/products?category=fashion-apparel"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-rose-600/30"
+                >
+                  <span>Explore Fashion Inside</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
-            <div className="w-28 sm:w-36 aspect-square rounded-2xl overflow-hidden shrink-0 shadow-lg border-2 border-white/20">
+            <div className="w-28 sm:w-36 aspect-square rounded-2xl overflow-hidden shrink-0 shadow-xl border-2 border-white/20 group-hover:scale-105 transition-transform duration-500">
               <img
-                src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500"
-                alt="Fashion"
+                src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=600&q=80"
+                alt="Fashion Department"
                 className="w-full h-full object-cover"
               />
             </div>
