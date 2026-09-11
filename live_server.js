@@ -17,13 +17,53 @@ async function run() {
   console.log('🚀 Starting ShopEase Continuous Server System');
   console.log('========================================================\n');
 
-  // 1. Start Backend Server
-  console.log('🔹 [1/3] Initializing Express & MySQL Backend (Port 5000)...');
+  // 1. Start Java Spring Boot Backend Server
+  console.log('🔹 [1/3] Initializing Java 21 + Spring Boot 3.3 Backend (Port 5000)...');
+  const backendDir = path.join(__dirname, 'Ecommerce', 'backend');
+  const backendLogPath = path.join(logsDir, 'backend.log');
+  const backendLog = fs.openSync(backendLogPath, 'a');
+
+  let isPort5000Open = false;
   try {
-    await import('./Ecommerce/backend/server.js');
-    console.log('   ✅ Backend active on http://127.0.0.1:5000');
+    const jarPath = path.join(backendDir, 'target', 'shopease-backend-1.0.0.jar');
+    let backendProc;
+    if (fs.existsSync(jarPath)) {
+      backendProc = spawn('java', ['-jar', 'target/shopease-backend-1.0.0.jar'], {
+        cwd: backendDir,
+        stdio: ['ignore', backendLog, backendLog]
+      });
+    } else if (process.platform === 'win32') {
+      backendProc = spawn('cmd.exe', ['/c', 'mvnw.cmd spring-boot:run'], {
+        cwd: backendDir,
+        stdio: ['ignore', backendLog, backendLog]
+      });
+    } else {
+      backendProc = spawn('./mvnw', ['spring-boot:run'], {
+        cwd: backendDir,
+        stdio: ['ignore', backendLog, backendLog]
+      });
+    }
+    backendProc.unref();
+
+    // Poll until Spring Boot is ready on port 5000
+    for (let i = 0; i < 25; i++) {
+      await new Promise((r) => setTimeout(r, 1000));
+      try {
+        const check = await fetch('http://127.0.0.1:5000/api/health');
+        if (check.ok || check.status === 200) {
+          isPort5000Open = true;
+          break;
+        }
+      } catch {}
+    }
   } catch (err) {
-    console.log('   ℹ️ Backend already running or initialized:', err.message);
+    console.log('   ℹ️ Backend initialization notice:', err.message);
+  }
+
+  if (isPort5000Open) {
+    console.log('   ✅ Spring Boot Backend active on http://127.0.0.1:5000');
+  } else {
+    console.log('   ℹ️ Spring Boot Backend process started on http://127.0.0.1:5000 (see .service_logs/backend.log)');
   }
 
   // 2. Start Vite Frontend Server

@@ -45,15 +45,21 @@ async function main() {
     const mvnwCmd = process.platform === 'win32' ? 'mvnw.cmd' : './mvnw';
     
     let backendProc;
-    if (fs.existsSync(path.join(backendDir, mvnwCmd))) {
-      backendProc = spawn(path.join(backendDir, mvnwCmd), ['spring-boot:run'], {
+    const jarPath = path.join(backendDir, 'target', 'shopease-backend-1.0.0.jar');
+    if (fs.existsSync(jarPath)) {
+      backendProc = spawn('java', ['-jar', 'target/shopease-backend-1.0.0.jar'], {
         cwd: backendDir,
         detached: true,
-        shell: true,
+        stdio: ['ignore', backendLog, backendLog]
+      });
+    } else if (process.platform === 'win32') {
+      backendProc = spawn('cmd.exe', ['/c', 'mvnw.cmd spring-boot:run'], {
+        cwd: backendDir,
+        detached: true,
         stdio: ['ignore', backendLog, backendLog]
       });
     } else {
-      backendProc = spawn(process.execPath, ['server.js'], {
+      backendProc = spawn('./mvnw', ['spring-boot:run'], {
         cwd: backendDir,
         detached: true,
         stdio: ['ignore', backendLog, backendLog]
