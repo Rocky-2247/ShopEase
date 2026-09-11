@@ -29,13 +29,16 @@ import {
   Video,
   Eye,
   Maximize2,
-  RotateCw
+  RotateCw,
+  Scale
 } from 'lucide-react';
 import { productsAPI, reviewsAPI, uploadAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useCompare } from '../components/product/ProductCompareModal';
+import { RecentlyViewed, addRecentlyViewed } from '../components/common/RecentlyViewed';
 import { StarRating } from '../components/common/StarRating';
 import { ProductCard } from '../components/product/ProductCard';
 import { Loader } from '../components/common/Loader';
@@ -46,6 +49,7 @@ export const ProductDetails = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const { user } = useAuth();
   const { showToast } = useToast();
 
@@ -86,6 +90,9 @@ export const ProductDetails = () => {
           const prod = res.data.data;
           setProduct(prod);
           setSelectedImage(prod.image_url);
+
+          // Track in recently viewed
+          addRecentlyViewed(prod);
 
           // Select default variant if available
           if (prod.variants && prod.variants.length > 0) {
@@ -737,6 +744,45 @@ export const ProductDetails = () => {
                 Buy Now
               </button>
             </div>
+
+            {/* Secondary Actions: Wishlist & Compare */}
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <button
+                onClick={() => toggleWishlist(product)}
+                className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                  isWishlisted(product?.id)
+                    ? 'bg-rose-50 border-rose-200 text-rose-600'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${isWishlisted(product?.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
+                {isWishlisted(product?.id) ? 'Wishlisted' : 'Add to Wishlist'}
+              </button>
+
+              <button
+                onClick={() => {
+                  if (isInCompare(product?.id)) {
+                    removeFromCompare(product?.id);
+                    showToast(`Removed from comparison`, 'info');
+                  } else {
+                    const res = addToCompare(product);
+                    if (res === 'MAX_REACHED') {
+                      showToast('You can compare max 4 products', 'warning');
+                    } else if (res) {
+                      showToast(`Added to product comparison!`, 'success');
+                    }
+                  }
+                }}
+                className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                  isInCompare(product?.id)
+                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Scale className="w-4 h-4" />
+                {isInCompare(product?.id) ? 'Comparing (In List)' : 'Compare Product'}
+              </button>
+            </div>
           </div>
 
           {/* Delivery & Assurance Perks */}
@@ -965,6 +1011,9 @@ export const ProductDetails = () => {
           </div>
         </section>
       )}
+
+      {/* Persistent Recently Viewed Carousel */}
+      <RecentlyViewed currentProductId={product?.id} title="You Recently Checked Out" />
 
     </div>
   );

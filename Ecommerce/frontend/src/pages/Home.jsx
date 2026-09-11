@@ -35,6 +35,7 @@ import { DepartmentShowcase } from '../components/home/DepartmentShowcase';
 import { BrandMarquee } from '../components/common/BrandMarquee';
 import { BrandSpotlightAd } from '../components/common/BrandSpotlightAd';
 import { AllBrandsShowcase } from '../components/common/AllBrandsShowcase';
+import { RecentlyViewed } from '../components/common/RecentlyViewed';
 import { useToast } from '../context/ToastContext';
 import { formatPrice } from '../utils/currency';
 
@@ -446,6 +447,11 @@ export const Home = () => {
             ))
           )}
         </div>
+      </section>
+
+      {/* 8. Recently Viewed Browsing History */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+        <RecentlyViewed />
       </section>
 
     </div>

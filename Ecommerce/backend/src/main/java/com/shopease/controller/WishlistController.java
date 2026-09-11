@@ -1,7 +1,7 @@
 package com.shopease.controller;
 
 import com.shopease.dto.ApiResponse;
-import com.shopease.entity.WishlistItem;
+import com.shopease.entity.Product;
 import com.shopease.security.UserPrincipal;
 import com.shopease.service.WishlistService;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +20,11 @@ public class WishlistController {
     private final WishlistService wishlistService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<WishlistItem>>> getWishlist(@AuthenticationPrincipal UserPrincipal currentUser) {
+    public ResponseEntity<ApiResponse<List<Product>>> getWishlist(@AuthenticationPrincipal UserPrincipal currentUser) {
         if (currentUser == null) {
             return ResponseEntity.status(401).body(ApiResponse.error("Not authorized"));
         }
-        List<WishlistItem> wishlist = wishlistService.getWishlist(currentUser.getId());
+        List<Product> wishlist = wishlistService.getWishlist(currentUser.getId());
         return ResponseEntity.ok(ApiResponse.success(wishlist));
     }
 
@@ -44,7 +44,7 @@ public class WishlistController {
 
         boolean added = wishlistService.toggleWishlist(currentUser.getId(), productId);
         String msg = added ? "Added to wishlist" : "Removed from wishlist";
-        return ResponseEntity.ok(ApiResponse.success(Map.of("added", added), msg));
+        return ResponseEntity.ok(ApiResponse.success(Map.of("added", added, "is_wishlisted", added), msg));
     }
 
     @DeleteMapping("/remove/{productId}")

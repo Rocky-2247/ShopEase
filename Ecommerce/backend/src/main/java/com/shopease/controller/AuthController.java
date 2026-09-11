@@ -126,4 +126,17 @@ public class AuthController {
         authService.deleteAddress(id, currentUser.getId());
         return ResponseEntity.ok(ApiResponse.success(null, "Address deleted successfully"));
     }
+
+    @PostMapping("/newsletter")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> subscribeNewsletter(@RequestBody Map<String, String> payload) {
+        String email = payload != null ? payload.get("email") : null;
+        if (email == null || !email.contains("@")) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Please provide a valid email address"));
+        }
+        Map<String, Object> data = Map.of(
+                "coupon", "WELCOME10",
+                "discount", "10%"
+        );
+        return ResponseEntity.ok(ApiResponse.success(data, "Subscribed successfully! Use coupon WELCOME10 for 10% off your next order."));
+    }
 }

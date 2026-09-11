@@ -3,6 +3,8 @@ package com.shopease.controller;
 import com.shopease.dto.ApiResponse;
 import com.shopease.dto.OrderDtos.CheckoutRequest;
 import com.shopease.dto.OrderDtos.OrderStatusUpdateRequest;
+import com.shopease.dto.OrderDtos.OrderReturnRequest;
+import com.shopease.dto.OrderDtos.OrderReturnStatusUpdateRequest;
 import com.shopease.entity.Order;
 import com.shopease.entity.User;
 import com.shopease.repository.UserRepository;
@@ -152,6 +154,40 @@ public class OrderController {
         try {
             Order updated = orderService.updateOrderStatusAdmin(id, request);
             return ResponseEntity.ok(ApiResponse.success(updated, "Order status updated to \"" + updated.getOrderStatus() + "\""));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/return")
+    public ResponseEntity<ApiResponse<Order>> requestOrderReturn(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @PathVariable Long id,
+            @RequestBody OrderReturnRequest request) {
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Not authorized, please sign in"));
+        }
+
+        try {
+            Order returnedOrder = orderService.requestReturn(id, currentUser.getId(), request);
+            return ResponseEntity.ok(ApiResponse.success(returnedOrder, "Return request submitted successfully. Support will review shortly."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/return-status")
+    public ResponseEntity<ApiResponse<Order>> updateOrderReturnStatus(
+            @PathVariable Long id,
+            @RequestBody OrderReturnStatusUpdateRequest request) {
+
+        try {
+            Order updated = orderService.updateReturnStatus(id, request);
+            String actionMsg = "Approved".equalsIgnoreCase(request.getReturnStatus()) 
+                    ? "Return approved! Order has been refunded and items restocked." 
+                    : "Return request marked as " + request.getReturnStatus();
+            return ResponseEntity.ok(ApiResponse.success(updated, actionMsg));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }

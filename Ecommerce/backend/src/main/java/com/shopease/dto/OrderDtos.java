@@ -100,4 +100,25 @@ public class OrderDtos {
         @JsonProperty("razorpay_signature")
         private String razorpaySignature;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class OrderReturnRequest {
+        private String reason;
+        private String comments;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class OrderReturnStatusUpdateRequest {
+        @JsonProperty("return_status")
+        private String returnStatus; // 'Approved', 'Rejected'
+        private String comments;
+    }
 }

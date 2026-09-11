@@ -148,7 +148,18 @@ public class CartService {
             throw new IllegalArgumentException("Cart identifier required");
         }
 
-        cartItemRepository.findById(itemId).ifPresent(cartItemRepository::delete);
+        Optional<CartItem> itemOpt = cartItemRepository.findById(itemId);
+        if (itemOpt.isPresent()) {
+            cartItemRepository.delete(itemOpt.get());
+        } else {
+            if (userId != null) {
+                cartItemRepository.findFirstByUserIdAndProductId(userId, itemId)
+                        .ifPresent(cartItemRepository::delete);
+            } else {
+                cartItemRepository.findFirstBySessionIdAndProductId(sessionId, itemId)
+                        .ifPresent(cartItemRepository::delete);
+            }
+        }
 
         return getCart(userId, sessionId);
     }

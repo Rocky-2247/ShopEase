@@ -308,4 +308,76 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
+
+    @Transactional
+    public Order requestReturn(Long orderId, Long userId, OrderReturnRequest request) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        if (!order.getUserId().equals(userId)) {
+            throw new IllegalStateException("Not authorized to request return for this order");
+        }
+
+        if (!"Delivered".equalsIgnoreCase(order.getOrderStatus())) {
+            throw new IllegalStateException("Returns can only be requested for orders with 'Delivered' status");
+        }
+
+        if ("Requested".equalsIgnoreCase(order.getReturnStatus())) {
+            throw new IllegalStateException("A return request has already been submitted for this order");
+        }
+
+        if ("Approved".equalsIgnoreCase(order.getReturnStatus())) {
+            throw new IllegalStateException("Return request has already been approved");
+        }
+
+        String fullReason = request.getReason() != null ? request.getReason() : "Customer Return";
+        if (request.getComments() != null && !request.getComments().isBlank()) {
+            fullReason += ": " + request.getComments();
+        }
+
+        order.setReturnStatus("Requested");
+        order.setReturnReason(fullReason);
+        order.setReturnRequestedAt(LocalDateTime.now());
+
+        return orderRepository.save(order);
+    }
+
+    @Transactional
+    public Order updateReturnStatus(Long orderId, OrderReturnStatusUpdateRequest request) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        if (request.getReturnStatus() == null || request.getReturnStatus().isBlank()) {
+            throw new IllegalArgumentException("Return status is required");
+        }
+
+        String status = request.getReturnStatus().trim();
+        if ("Approved".equalsIgnoreCase(status)) {
+            order.setReturnStatus("Approved");
+            order.setOrderStatus("Refunded");
+            order.setPaymentStatus("Refunded");
+
+            // Restock items
+            for (OrderItem item : order.getItems()) {
+                if (item.getVariantId() != null) {
+                    productVariantRepository.findById(item.getVariantId()).ifPresent(v -> {
+                        v.setStock(v.getStock() + item.getQuantity());
+                        productVariantRepository.save(v);
+                    });
+                }
+                if (item.getProductId() != null) {
+                    productRepository.findById(item.getProductId()).ifPresent(p -> {
+                        p.setStock(p.getStock() + item.getQuantity());
+                        productRepository.save(p);
+                    });
+                }
+            }
+        } else if ("Rejected".equalsIgnoreCase(status)) {
+            order.setReturnStatus("Rejected");
+        } else {
+            order.setReturnStatus(status);
+        }
+
+        return orderRepository.save(order);
+    }
 }

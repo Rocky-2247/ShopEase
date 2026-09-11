@@ -6,6 +6,7 @@ import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { CompareProvider } from './components/product/ProductCompareModal';
 
 // Components
 import { Navbar } from './components/common/Navbar';
@@ -129,9 +130,11 @@ export function App() {
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AppLayout />
-            </BrowserRouter>
+            <CompareProvider>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <AppLayout />
+              </BrowserRouter>
+            </CompareProvider>
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

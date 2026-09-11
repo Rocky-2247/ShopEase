@@ -27,6 +27,7 @@ import { productsAPI, categoriesAPI } from '../services/api';
 import { ProductCard } from '../components/product/ProductCard';
 import { ProductCardSkeleton } from '../components/common/Loader';
 import { BrandMarquee } from '../components/common/BrandMarquee';
+import { Pagination } from '../components/common/Pagination';
 import { useToast } from '../context/ToastContext';
 import { getDepartmentMeta } from '../utils/departmentData';
 
@@ -81,6 +82,7 @@ export const Products = () => {
   const inStock = searchParams.get('inStock') === 'true';
   const sort = searchParams.get('sort') || 'newest';
   const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = parseInt(searchParams.get('limit') || '12', 10);
 
   // Fetch Categories & Brands once
   useEffect(() => {
@@ -109,7 +111,7 @@ export const Products = () => {
         inStock: inStock ? 'true' : undefined,
         sort,
         page,
-        limit: 12
+        limit
       };
 
       const res = await productsAPI.getAll(params);
@@ -122,7 +124,7 @@ export const Products = () => {
     } finally {
       setLoading(false);
     }
-  }, [keyword, category, brand, minPrice, maxPrice, rating, inStock, sort, page]);
+  }, [keyword, category, brand, minPrice, maxPrice, rating, inStock, sort, page, limit]);
 
   useEffect(() => {
     fetchProducts();
@@ -143,6 +145,13 @@ export const Products = () => {
   const handlePageChange = (newPage) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('page', newPage.toString());
+    setSearchParams(newParams);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('limit', newLimit.toString());
+    newParams.set('page', '1');
     setSearchParams(newParams);
   };
 
@@ -600,40 +609,18 @@ export const Products = () => {
             </div>
           )}
 
-          {/* Pagination */}
-          {pagination.pages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-6">
-              <button
-                disabled={pagination.page <= 1}
-                onClick={() => handlePageChange(pagination.page - 1)}
-                className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((pNum) => (
-                <button
-                  key={pNum}
-                  onClick={() => handlePageChange(pNum)}
-                  className={`w-10 h-10 rounded-xl text-xs font-bold transition-all ${
-                    pagination.page === pNum
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  {pNum}
-                </button>
-              ))}
-
-              <button
-                disabled={pagination.page >= pagination.pages}
-                onClick={() => handlePageChange(pagination.page + 1)}
-                className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
+          {/* Modern Smart Pagination */}
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.pages}
+            totalItems={pagination.total}
+            itemsPerPage={limit}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
+            showLimitSelector={true}
+            showQuickJump={true}
+            showSummary={true}
+          />
         </div>
 
       </div>

@@ -1,14 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingBag, Tag, Zap, Truck, Video, Layers } from 'lucide-react';
+import { Heart, ShoppingBag, Tag, Zap, Truck, Video, Layers, Scale } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useCompare } from './ProductCompareModal';
+import { useToast } from '../../context/ToastContext';
 import { StarRating } from '../common/StarRating';
 import { formatPrice } from '../../utils/currency';
 
 export const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+  const { showToast } = useToast();
 
   if (!product) return null;
 
@@ -83,18 +87,46 @@ export const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {/* Wishlist Button */}
-        <button
-          onClick={() => toggleWishlist(product)}
-          className={`absolute top-3 right-3 p-2.5 rounded-full backdrop-blur-md shadow-sm transition-all duration-200 cursor-pointer ${
-            wishlisted
-              ? 'bg-rose-50 text-rose-500 shadow-rose-200'
-              : 'bg-white/85 text-slate-400 hover:text-rose-500 hover:bg-white'
-          }`}
-          title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
-        >
-          <Heart className={`w-4 h-4 ${wishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
-        </button>
+        {/* Action Buttons (Wishlist & Compare) */}
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
+          <button
+            onClick={() => toggleWishlist(product)}
+            className={`p-2.5 rounded-full backdrop-blur-md shadow-sm transition-all duration-200 cursor-pointer ${
+              wishlisted
+                ? 'bg-rose-50 text-rose-500 shadow-rose-200'
+                : 'bg-white/85 text-slate-400 hover:text-rose-500 hover:bg-white'
+            }`}
+            title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          >
+            <Heart className={`w-4 h-4 ${wishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (isInCompare(product.id)) {
+                removeFromCompare(product.id);
+                showToast(`Removed ${product.name} from comparison`, 'info');
+              } else {
+                const res = addToCompare(product);
+                if (res === 'MAX_REACHED') {
+                  showToast('You can compare a maximum of 4 products at once', 'warning');
+                } else if (res) {
+                  showToast(`Added ${product.name} to comparison!`, 'success');
+                }
+              }
+            }}
+            className={`p-2.5 rounded-full backdrop-blur-md shadow-sm transition-all duration-200 cursor-pointer ${
+              isInCompare(product.id)
+                ? 'bg-indigo-600 text-white shadow-indigo-200'
+                : 'bg-white/85 text-slate-400 hover:text-indigo-600 hover:bg-white'
+            }`}
+            title={isInCompare(product.id) ? 'Remove from compare' : 'Compare product'}
+          >
+            <Scale className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Product Information */}

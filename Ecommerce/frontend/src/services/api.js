@@ -147,6 +147,8 @@ export const ordersAPI = {
   getUserOrders: () => api.get('/orders'),
   getById: (id) => api.get(`/orders/${id}`),
   cancel: (id) => api.put(`/orders/${id}/cancel`),
+  requestReturn: (id, data) => api.post(`/orders/${id}/return`, data),
+  updateReturnStatus: (id, data) => api.put(`/orders/${id}/return-status`, data),
   downloadInvoice: (id) => api.get(`/orders/${id}/invoice`, { responseType: 'blob' }),
   downloadInvoiceFile,
   getAllAdmin: (params) => api.get('/orders/admin/all', { params }),

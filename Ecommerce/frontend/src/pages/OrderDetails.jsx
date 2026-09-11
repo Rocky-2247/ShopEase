@@ -11,7 +11,11 @@ import {
   CreditCard,
   ChevronLeft,
   AlertTriangle,
-  FileText
+  FileText,
+  RotateCcw,
+  Send,
+  X,
+  AlertCircle
 } from 'lucide-react';
 import { OrderStatusBadge } from '../components/common/Badge';
 import { Loader } from '../components/common/Loader';
@@ -28,6 +32,12 @@ export const OrderDetails = () => {
   const [cancelling, setCancelling] = useState(false);
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+
+  // Return & Refund State
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnReason, setReturnReason] = useState('Damaged / Defective item');
+  const [returnComments, setReturnComments] = useState('');
+  const [submittingReturn, setSubmittingReturn] = useState(false);
 
   useEffect(() => {
     ordersAPI.getById(id)
@@ -59,6 +69,26 @@ export const OrderDetails = () => {
     }
   };
 
+  const handleRequestReturn = async (e) => {
+    e.preventDefault();
+    try {
+      setSubmittingReturn(true);
+      const res = await ordersAPI.requestReturn(order.id, {
+        reason: returnReason,
+        comments: returnComments
+      });
+      if (res.data.success) {
+        showToast('Return request submitted! Our team will review shortly.', 'success');
+        setOrder(res.data.data);
+        setShowReturnModal(false);
+      }
+    } catch (err) {
+      showToast(err.message || 'Could not submit return request', 'error');
+    } finally {
+      setSubmittingReturn(false);
+    }
+  };
+
   if (loading) {
     return <Loader text="Loading order details..." />;
   }
@@ -82,6 +112,8 @@ export const OrderDetails = () => {
   const statuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered'];
   const currentIndex = statuses.indexOf(order.order_status);
   const isCancelled = order.order_status === 'Cancelled';
+  const isDelivered = order.order_status === 'Delivered';
+  const hasReturnRequest = order.return_status && order.return_status !== 'None';
 
   const handleDownloadInvoice = async () => {
     try {
@@ -110,6 +142,17 @@ export const OrderDetails = () => {
               Order #{order.order_number}
             </h1>
             <OrderStatusBadge status={order.order_status} />
+            {hasReturnRequest && (
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                order.return_status === 'Approved'
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : order.return_status === 'Rejected'
+                  ? 'bg-rose-100 text-rose-800'
+                  : 'bg-amber-100 text-amber-800 animate-pulse'
+              }`}>
+                Return: {order.return_status}
+              </span>
+            )}
           </div>
           <p className="text-xs text-slate-400 mt-1">
             Placed on {new Date(order.createdAt).toLocaleString()}
@@ -134,7 +177,18 @@ export const OrderDetails = () => {
             <span>{downloadingInvoice ? 'Generating PDF...' : 'Tax Invoice PDF'}</span>
           </button>
 
-          {!isCancelled && order.order_status !== 'Delivered' && (
+          {/* Request Return Button */}
+          {isDelivered && !hasReturnRequest && (
+            <button
+              onClick={() => setShowReturnModal(true)}
+              className="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-xs rounded-xl shadow-2xs flex items-center gap-2 cursor-pointer transition-all"
+            >
+              <RotateCcw className="w-4 h-4 text-amber-600" />
+              <span>Request Return / Refund</span>
+            </button>
+          )}
+
+          {!isCancelled && !isDelivered && (
             <button
               disabled={cancelling}
               onClick={handleCancelOrder}
@@ -145,6 +199,36 @@ export const OrderDetails = () => {
           )}
         </div>
       </div>
+
+      {/* Return & Refund Status Alert */}
+      {hasReturnRequest && (
+        <div className={`p-5 rounded-3xl border flex items-start gap-4 ${
+          order.return_status === 'Approved'
+            ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
+            : order.return_status === 'Rejected'
+            ? 'bg-rose-50/80 border-rose-200 text-rose-900'
+            : 'bg-amber-50/80 border-amber-200 text-amber-900'
+        }`}>
+          <RotateCcw className="w-6 h-6 shrink-0 mt-0.5" />
+          <div className="space-y-1 text-xs">
+            <h4 className="font-extrabold text-sm">
+              Return Request Status: {order.return_status}
+            </h4>
+            <p className="opacity-90">
+              {order.return_status === 'Approved'
+                ? 'Your return has been approved! The order has been refunded and payment returned to original method.'
+                : order.return_status === 'Rejected'
+                ? 'Your return request was not approved by administration.'
+                : 'Your return request has been submitted and is currently under review by our operations team.'}
+            </p>
+            {order.return_reason && (
+              <p className="font-mono text-[11px] pt-1">
+                Reason: <strong>{order.return_reason}</strong>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Interactive Status Timeline */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-4">
@@ -284,6 +368,87 @@ export const OrderDetails = () => {
         onClose={() => setShowInvoiceModal(false)}
         order={order}
       />
+
+      {/* Return & Refund Request Modal */}
+      {showReturnModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-amber-100 text-amber-800">
+                  <RotateCcw className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Request Return / Refund</h3>
+                  <p className="text-xs text-slate-500">Order #{order.order_number}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowReturnModal(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleRequestReturn} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Select Return Reason
+                </label>
+                <select
+                  value={returnReason}
+                  onChange={(e) => setReturnReason(e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-amber-500 focus:outline-hidden bg-slate-50"
+                >
+                  <option value="Damaged / Defective item">Damaged or Defective item</option>
+                  <option value="Wrong item / size delivered">Wrong item or size delivered</option>
+                  <option value="Item not as described">Item differs from website description</option>
+                  <option value="Quality not as expected">Product quality not as expected</option>
+                  <option value="Arrived too late">Arrived too late for needed occasion</option>
+                  <option value="Accidental order / Changed mind">Accidental order / Changed mind</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Additional Details / Notes
+                </label>
+                <textarea
+                  rows="3"
+                  value={returnComments}
+                  onChange={(e) => setReturnComments(e.target.value)}
+                  placeholder="Please describe the issue in detail to expedite approval..."
+                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-amber-500 focus:outline-hidden bg-slate-50 placeholder:text-slate-400"
+                  required
+                />
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed">
+                💡 <strong>Return Policy:</strong> Once approved, the order items will be restocked and your refund will be processed back to your original payment method within 24-48 hours.
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowReturnModal(false)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingReturn}
+                  className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-amber-600/20 flex items-center gap-2"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>{submittingReturn ? 'Submitting...' : 'Submit Return Request'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -1,13 +1,16 @@
 package com.shopease.service;
 
 import com.shopease.dto.CartDtos.AddToCartRequest;
+import com.shopease.entity.Product;
 import com.shopease.entity.WishlistItem;
+import com.shopease.repository.ProductRepository;
 import com.shopease.repository.WishlistItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -15,11 +18,19 @@ import java.util.Optional;
 public class WishlistService {
 
     private final WishlistItemRepository wishlistRepository;
+    private final ProductRepository productRepository;
     private final CartService cartService;
 
     @Transactional(readOnly = true)
-    public List<WishlistItem> getWishlist(Long userId) {
-        return wishlistRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    public List<Product> getWishlist(Long userId) {
+        List<WishlistItem> items = wishlistRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return items.stream()
+                .map(item -> {
+                    if (item.getProduct() != null) return item.getProduct();
+                    return productRepository.findById(item.getProductId()).orElse(null);
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Transactional

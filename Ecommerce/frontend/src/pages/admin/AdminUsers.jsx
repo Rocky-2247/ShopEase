@@ -15,11 +15,15 @@ import {
 } from 'lucide-react';
 import { adminAPI } from '../../services/api';
 import { Loader } from '../../components/common/Loader';
+import { Pagination } from '../../components/common/Pagination';
 import { useToast } from '../../context/ToastContext';
 
 export const AdminUsers = () => {
   const { showToast } = useToast();
   const [users, setUsers] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('all');
@@ -28,9 +32,17 @@ export const AdminUsers = () => {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const res = await adminAPI.getUsers({ search, role, limit: 50 });
+      const res = await adminAPI.getUsers({
+        search: search.trim() || undefined,
+        role: role === 'all' ? undefined : role,
+        page: currentPage,
+        limit: itemsPerPage
+      });
       if (res.data.success) {
         setUsers(res.data.data.users || []);
+        if (res.data.data.pagination) {
+          setPagination(res.data.data.pagination);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -42,7 +54,7 @@ export const AdminUsers = () => {
 
   useEffect(() => {
     loadUsers();
-  }, [search, role]);
+  }, [search, role, currentPage, itemsPerPage]);
 
   const handleToggleBlock = async (user) => {
     try {
@@ -223,6 +235,25 @@ export const AdminUsers = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Table Pagination */}
+          <div className="p-4 border-t border-slate-800/80 bg-slate-950/40">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              totalItems={pagination.total}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(p) => setCurrentPage(p)}
+              onLimitChange={(l) => {
+                setItemsPerPage(l);
+                setCurrentPage(1);
+              }}
+              limitOptions={[10, 15, 30, 50]}
+              showLimitSelector={true}
+              showQuickJump={true}
+              showSummary={true}
+            />
           </div>
         </div>
       )}

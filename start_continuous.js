@@ -37,19 +37,32 @@ async function main() {
 
   const pids = {};
 
-  // 1. Start Backend if not already listening on port 5000
+  // 1. Start Java Spring Boot Backend if not already listening on port 5000
   if (!(await isPortListening(5000))) {
-    console.log('🔹 Launching Backend API (Port 5000)...');
+    console.log('🔹 Launching Java Spring Boot Backend API (Port 5000)...');
     const backendLog = fs.openSync(path.join(logsDir, 'backend.log'), 'a');
-    const backendProc = spawn(process.execPath, ['server.js'], {
-      cwd: path.join(__dirname, 'Ecommerce', 'backend'),
-      detached: true,
-      stdio: ['ignore', backendLog, backendLog]
-    });
+    const backendDir = path.join(__dirname, 'Ecommerce', 'backend');
+    const mvnwCmd = process.platform === 'win32' ? 'mvnw.cmd' : './mvnw';
+    
+    let backendProc;
+    if (fs.existsSync(path.join(backendDir, mvnwCmd))) {
+      backendProc = spawn(path.join(backendDir, mvnwCmd), ['spring-boot:run'], {
+        cwd: backendDir,
+        detached: true,
+        shell: true,
+        stdio: ['ignore', backendLog, backendLog]
+      });
+    } else {
+      backendProc = spawn(process.execPath, ['server.js'], {
+        cwd: backendDir,
+        detached: true,
+        stdio: ['ignore', backendLog, backendLog]
+      });
+    }
     backendProc.unref();
     pids.backend = backendProc.pid;
-    const ok = await waitForPort(5000);
-    console.log(`   ${ok ? '✅' : '⚠️'} Backend status: Port 5000 ${ok ? 'ONLINE' : 'WAITING'} (PID: ${backendProc.pid})`);
+    const ok = await waitForPort(5000, 30);
+    console.log(`   ${ok ? '✅' : '⚠️'} Java Backend status: Port 5000 ${ok ? 'ONLINE' : 'WAITING'} (PID: ${backendProc.pid})`);
   } else {
     console.log('   ℹ️ Backend is already active on Port 5000.');
   }

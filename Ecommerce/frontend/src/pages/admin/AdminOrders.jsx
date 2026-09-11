@@ -16,17 +16,25 @@ import {
   Package,
   Search,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  FileSpreadsheet,
+  RotateCcw,
+  Check,
+  XCircle
 } from 'lucide-react';
 import { ordersAPI, downloadInvoiceFile } from '../../services/api';
 import { Loader } from '../../components/common/Loader';
 import { OrderStatusBadge } from '../../components/common/Badge';
+import { Pagination } from '../../components/common/Pagination';
 import { useToast } from '../../context/ToastContext';
 import { formatPrice } from '../../utils/currency';
 
 export const AdminOrders = () => {
   const { showToast } = useToast();
   const [orders, setOrders] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,9 +47,16 @@ export const AdminOrders = () => {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const res = await ordersAPI.getAllAdmin({ status: selectedStatus === 'all' ? undefined : selectedStatus });
+      const res = await ordersAPI.getAllAdmin({
+        status: (selectedStatus === 'all' || selectedStatus === 'returns') ? undefined : selectedStatus,
+        page: currentPage,
+        limit: itemsPerPage
+      });
       if (res.data.success) {
         setOrders(res.data.data.orders || []);
+        if (res.data.data.pagination) {
+          setPagination(res.data.data.pagination);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -53,7 +68,12 @@ export const AdminOrders = () => {
 
   useEffect(() => {
     loadOrders();
-  }, [selectedStatus]);
+  }, [selectedStatus, currentPage, itemsPerPage]);
+
+  const handleStatusChange = (newStatus) => {
+    setSelectedStatus(newStatus);
+    setCurrentPage(1);
+  };
 
   const handleDownloadInvoice = async (orderId, orderNumber) => {
     try {
@@ -89,22 +109,106 @@ export const AdminOrders = () => {
     }
   };
 
+  const handleUpdateReturnStatus = async (orderId, newReturnStatus) => {
+    try {
+      await ordersAPI.updateReturnStatus(orderId, { return_status: newReturnStatus });
+      showToast(
+        newReturnStatus === 'Approved'
+          ? `Return approved! Order #${orderId} refunded and items restocked.`
+          : `Return request marked as ${newReturnStatus}`,
+        'success'
+      );
+      loadOrders();
+      if (inspectOrder && inspectOrder.id === orderId) {
+        setInspectOrder((prev) => ({
+          ...prev,
+          return_status: newReturnStatus,
+          order_status: newReturnStatus === 'Approved' ? 'Refunded' : prev.order_status,
+          payment_status: newReturnStatus === 'Approved' ? 'Refunded' : prev.payment_status
+        }));
+      }
+    } catch (err) {
+      showToast(err.message || 'Failed to update return status', 'error');
+    }
+  };
+
+  const handleExportOrdersCSV = () => {
+    if (orders.length === 0) {
+      showToast('No orders to export', 'warning');
+      return;
+    }
+
+    const headers = [
+      'Order Number',
+      'Date Placed',
+      'Customer Name',
+      'Customer Email',
+      'Items Count',
+      'Total Amount ($)',
+      'Discount ($)',
+      'Shipping ($)',
+      'Final Amount ($)',
+      'Payment Method',
+      'Payment Status',
+      'Order Status',
+      'Return Status',
+      'Return Reason'
+    ];
+
+    const rows = filteredOrders.map((o) => [
+      `"${o.order_number || o.id}"`,
+      `"${new Date(o.createdAt || o.created_at || Date.now()).toLocaleDateString()}"`,
+      `"${(o.user?.name || '').replace(/"/g, '""')}"`,
+      `"${(o.user?.email || '').replace(/"/g, '""')}"`,
+      o.items?.length || 0,
+      o.total_amount || 0,
+      o.discount_amount || 0,
+      o.shipping_charge || 0,
+      o.final_amount || 0,
+      `"${o.payment_method || ''}"`,
+      `"${o.payment_status || ''}"`,
+      `"${o.order_status || ''}"`,
+      `"${o.return_status || 'None'}"`,
+      `"${(o.return_reason || '').replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `ShopEase_Orders_Export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('Orders exported to CSV successfully!', 'success');
+  };
+
   const filteredOrders = orders.filter((o) => {
+    if (selectedStatus === 'returns') {
+      if (!o.return_status || o.return_status === 'None') return false;
+    } else if (selectedStatus !== 'all' && o.order_status !== selectedStatus) {
+      return false;
+    }
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
       (o.order_number && o.order_number.toLowerCase().includes(q)) ||
       (o.user?.name && o.user.name.toLowerCase().includes(q)) ||
-      (o.user?.email && o.user.email.toLowerCase().includes(q))
+      (o.user?.email && o.user.email.toLowerCase().includes(q)) ||
+      (o.return_status && o.return_status.toLowerCase().includes(q))
     );
   });
+
+  const returnRequestsCount = orders.filter((o) => o.return_status === 'Requested').length;
 
   const statusTabs = [
     { id: 'all', label: 'All Orders' },
     { id: 'Pending', label: 'Pending' },
+    { id: 'Confirmed', label: 'Confirmed' },
     { id: 'Processing', label: 'Processing' },
     { id: 'Shipped', label: 'Shipped' },
     { id: 'Delivered', label: 'Delivered' },
+    { id: 'returns', label: `Returns ${returnRequestsCount > 0 ? `(${returnRequestsCount})` : ''}` },
     { id: 'Cancelled', label: 'Cancelled' }
   ];
 
@@ -118,9 +222,17 @@ export const AdminOrders = () => {
             Order Fulfillment & Invoicing Hub
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Track customer orders, update delivery status pipelines, view items, and generate tax invoices.
+            Track customer orders, manage return requests, update delivery pipelines, and export sales CSV reports.
           </p>
         </div>
+
+        <button
+          onClick={handleExportOrdersCSV}
+          className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all self-start sm:self-auto cursor-pointer"
+        >
+          <FileSpreadsheet className="w-4 h-4" />
+          <span>Export Orders (CSV)</span>
+        </button>
       </div>
 
       {/* Filter Tabs & Search */}
@@ -131,7 +243,7 @@ export const AdminOrders = () => {
             {statusTabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setSelectedStatus(tab.id)}
+                onClick={() => handleStatusChange(tab.id)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                   selectedStatus === tab.id
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
@@ -246,6 +358,25 @@ export const AdminOrders = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Table Pagination */}
+          <div className="p-4 border-t border-slate-800/80 bg-slate-950/40">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              totalItems={pagination.total}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(p) => setCurrentPage(p)}
+              onLimitChange={(l) => {
+                setItemsPerPage(l);
+                setCurrentPage(1);
+              }}
+              limitOptions={[10, 20, 50, 100]}
+              showLimitSelector={true}
+              showQuickJump={true}
+              showSummary={true}
+            />
+          </div>
         </div>
       )}
 
@@ -298,6 +429,55 @@ export const AdminOrders = () => {
                 </p>
               </div>
             </div>
+
+            {/* Return Request Review Banner (if applicable) */}
+            {inspectOrder.return_status && inspectOrder.return_status !== 'None' && (
+              <div className={`p-4 rounded-2xl border space-y-3 ${
+                inspectOrder.return_status === 'Approved'
+                  ? 'bg-emerald-950/40 border-emerald-800 text-emerald-200'
+                  : inspectOrder.return_status === 'Rejected'
+                  ? 'bg-rose-950/40 border-rose-800 text-rose-200'
+                  : 'bg-amber-950/50 border-amber-700/80 text-amber-200'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-xs">
+                    <RotateCcw className="w-4 h-4" />
+                    <span>Return Request Status: <strong>{inspectOrder.return_status}</strong></span>
+                  </div>
+                  {inspectOrder.return_requested_at && (
+                    <span className="text-[10px] opacity-75">
+                      {new Date(inspectOrder.return_requested_at).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+
+                {inspectOrder.return_reason && (
+                  <p className="text-xs bg-black/40 p-2.5 rounded-xl border border-white/5 font-mono">
+                    <strong>Customer Note:</strong> {inspectOrder.return_reason}
+                  </p>
+                )}
+
+                {/* Approve / Reject Controls */}
+                {inspectOrder.return_status === 'Requested' && (
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      onClick={() => handleUpdateReturnStatus(inspectOrder.id, 'Approved')}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-md shadow-emerald-600/20"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Approve Return & Refund</span>
+                    </button>
+                    <button
+                      onClick={() => handleUpdateReturnStatus(inspectOrder.id, 'Rejected')}
+                      className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5"
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>Reject Return</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Items List */}
             <div className="space-y-3">
