@@ -58,7 +58,9 @@ public class WebSecurityConfig {
                 
                 // Public Product & Category Read Endpoints
                 .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/reviews/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/payment/validate-coupon").permitAll()
+                
+                // Public Payment Endpoints (UPI, Gateway order init, verify & coupons)
+                .requestMatchers("/api/payment/**").permitAll()
                 
                 // Cart Endpoints (supports both guest session & authenticated user)
                 .requestMatchers("/api/cart/**").permitAll()
@@ -66,7 +68,7 @@ public class WebSecurityConfig {
                 // Admin-Only Endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/products/**", "/api/categories/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/categories/**", "/api/orders/*/status").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/categories/**", "/api/orders/*/status", "/api/orders/*/return-status").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/categories/**").hasRole("ADMIN")
                 .requestMatchers("/api/orders/admin/**").hasRole("ADMIN")
                 

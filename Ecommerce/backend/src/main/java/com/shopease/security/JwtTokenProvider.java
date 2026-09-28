@@ -30,6 +30,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .subject(String.valueOf(userId))
+                .claim("type", "access")
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
@@ -47,6 +48,29 @@ public class JwtTokenProvider {
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
+    }
+
+    public String getTokenType(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return claims.get("type", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean isAccessToken(String token) {
+        String type = getTokenType(token);
+        return type == null || "access".equalsIgnoreCase(type);
+    }
+
+    public boolean isPasswordResetToken(String token) {
+        String type = getTokenType(token);
+        return "password_reset".equalsIgnoreCase(type);
     }
 
     public Long getUserIdFromJWT(String token) {

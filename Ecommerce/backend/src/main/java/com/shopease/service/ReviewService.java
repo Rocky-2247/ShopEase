@@ -20,6 +20,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final com.shopease.repository.OrderItemRepository orderItemRepository;
 
     @Transactional(readOnly = true)
     public List<Review> getProductReviews(Long productId) {
@@ -38,6 +39,8 @@ public class ReviewService {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
         }
 
+        boolean hasPurchased = orderItemRepository.existsByUserIdAndProductIdPurchased(userId, productId);
+
         Review review = Review.builder()
                 .userId(userId)
                 .productId(productId)
@@ -45,7 +48,7 @@ public class ReviewService {
                 .rating(request.getRating())
                 .comment(request.getComment() != null ? request.getComment() : "")
                 .imageUrl(request.getImageUrl())
-                .isVerifiedBuyer(true)
+                .isVerifiedBuyer(hasPurchased)
                 .build();
 
         Review savedReview = reviewRepository.save(review);

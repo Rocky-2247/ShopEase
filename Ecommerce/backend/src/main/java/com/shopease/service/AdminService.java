@@ -42,29 +42,32 @@ public class AdminService {
         List<Order> recentOrders = orderRepository.findTop5ByOrderByCreatedAtDesc();
         List<Product> lowStockProducts = productRepository.findByStockLessThanEqualOrderByStockAsc(10, PageRequest.of(0, 6));
 
-        // Monthly Sales Aggregation
+        // Monthly Sales Aggregation (Last 6 Months)
+        java.time.LocalDateTime sixMonthsAgo = java.time.LocalDateTime.now().minusMonths(6).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
         List<Order> activeOrders = orderRepository.findByOrderStatusNot("Cancelled");
         String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         Map<String, Map<String, Object>> monthMap = new LinkedHashMap<>();
 
-        int currentMonth = java.time.LocalDate.now().getMonthValue() - 1;
+        java.time.LocalDate now = java.time.LocalDate.now();
         for (int i = 5; i >= 0; i--) {
-            int mIndex = (currentMonth - i + 12) % 12;
-            String mName = monthNames[mIndex];
+            java.time.LocalDate target = now.minusMonths(i);
+            String mName = monthNames[target.getMonthValue() - 1];
+            String key = target.getYear() + "-" + target.getMonthValue();
             Map<String, Object> mData = new HashMap<>();
             mData.put("name", mName);
+            mData.put("year", target.getYear());
+            mData.put("key", key);
             mData.put("revenue", 0.0);
             mData.put("orders", 0);
-            monthMap.put(mName, mData);
+            monthMap.put(key, mData);
         }
 
         for (Order o : activeOrders) {
-            if (o.getCreatedAt() != null) {
-                Month m = o.getCreatedAt().getMonth();
-                String mName = monthNames[m.getValue() - 1];
-                if (monthMap.containsKey(mName)) {
-                    Map<String, Object> data = monthMap.get(mName);
-                    double rev = (double) data.get("revenue") + o.getFinalAmount();
+            if (o.getCreatedAt() != null && o.getCreatedAt().isAfter(sixMonthsAgo)) {
+                String key = o.getCreatedAt().getYear() + "-" + o.getCreatedAt().getMonthValue();
+                if (monthMap.containsKey(key)) {
+                    Map<String, Object> data = monthMap.get(key);
+                    double rev = (double) data.get("revenue") + (o.getFinalAmount() != null ? o.getFinalAmount() : 0.0);
                     int count = (int) data.get("orders") + 1;
                     data.put("revenue", Math.round(rev * 100.0) / 100.0);
                     data.put("orders", count);

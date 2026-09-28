@@ -82,11 +82,18 @@ public class UploadController {
         }
     }
 
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
+            "image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"
+    );
+
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+            ".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"
+    );
+
     private String saveFile(MultipartFile file) throws IOException {
-        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-        File uploadFolder = uploadPath.toFile();
-        if (!uploadFolder.exists()) {
-            uploadFolder.mkdirs();
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType.toLowerCase())) {
+            throw new IllegalArgumentException("Invalid file type. Only JPEG, PNG, WEBP, GIF, and SVG images are allowed.");
         }
 
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNullElse(file.getOriginalFilename(), "image.jpg"));
@@ -96,8 +103,18 @@ public class UploadController {
             extension = originalFilename.substring(dotIndex).toLowerCase();
         }
 
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new IllegalArgumentException("Invalid file extension: " + extension);
+        }
+
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        File uploadFolder = uploadPath.toFile();
+        if (!uploadFolder.exists()) {
+            uploadFolder.mkdirs();
+        }
+
         String safeBaseName = originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_");
-        String uniqueFilename = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + (extension.isEmpty() ? ".jpg" : "") + "_" + safeBaseName;
+        String uniqueFilename = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + extension + "_" + safeBaseName;
 
         Path targetLocation = uploadPath.resolve(uniqueFilename);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);

@@ -7,6 +7,7 @@ import com.shopease.repository.AddressRepository;
 import com.shopease.repository.UserRepository;
 import com.shopease.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -132,26 +134,22 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public Map<String, Object> forgotPassword(String email) {
-        String emailClean = email.toLowerCase().trim();
+        String emailClean = email != null ? email.toLowerCase().trim() : "";
         User user = userRepository.findByEmailIgnoreCase(emailClean).orElse(null);
 
         Map<String, Object> result = new HashMap<>();
         if (user != null) {
             String resetToken = jwtTokenProvider.generatePasswordResetToken(user.getId());
-            Map<String, String> data = new HashMap<>();
-            data.put("reset_token", resetToken);
-            data.put("reset_url", "/reset-password/" + resetToken);
-            result.put("data", data);
-        } else {
-            result.put("data", null);
+            // Secure dispatch: simulate sending email securely and log server-side without leaking token in API response
+            log.info("📧 [MAILER DISPATCH] Password reset instructions sent to {} (Token: {})", user.getEmail(), resetToken);
         }
-        result.put("message", "If an account exists with this email, a password reset link has been dispatched.");
+        result.put("message", "If an account exists with this email address, password reset instructions have been dispatched.");
         return result;
     }
 
     @Transactional
     public AuthResponse resetPassword(String token, String newPassword) {
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
+        if (token == null || !jwtTokenProvider.validateToken(token) || !jwtTokenProvider.isPasswordResetToken(token)) {
             throw new IllegalArgumentException("Password reset link has expired or is invalid. Please request a new one.");
         }
 

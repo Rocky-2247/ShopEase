@@ -68,6 +68,7 @@ The complete 12-chapter technical documentation suite is maintained in the [`doc
 | **10** | [Deployment Architecture](docs/10-Deployment-Architecture.md) | Local single-command launch, Spring profiles (`dev` with H2 vs `mysql` with MySQL), Dockerfiles, and Nginx setup. |
 | **11** | [Testing Strategy](docs/11-Testing-Strategy.md) | Automated backend JUnit 5 tests, live E2E integration runner (`test_e2e.js`), testing pyramid, and test matrix. |
 | **12** | [Strategic Roadmap](docs/12-Future-Enhancements.md) | Future enhancements: Redis caching, OAuth2 social login, WebSockets / SSE for live tracking, and multi-vendor marketplace. |
+| **13** | [Production Audit & Hardening Report](docs/13-Production-Audit-And-Hardening-Report.md) | Comprehensive security analysis, vulnerability remediation, cryptographic webhook verification, and test execution report. |
 
 ---
 

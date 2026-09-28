@@ -69,6 +69,7 @@ public class OrderController {
     }
 
     @GetMapping("/admin/all")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Object>> getAllOrdersAdmin(
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") Integer page,
@@ -147,6 +148,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Order>> updateOrderStatus(
             @PathVariable Long id,
             @RequestBody OrderStatusUpdateRequest request) {
@@ -178,6 +180,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/return-status")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Order>> updateOrderReturnStatus(
             @PathVariable Long id,
             @RequestBody OrderReturnStatusUpdateRequest request) {
