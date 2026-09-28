@@ -1,4 +1,4 @@
-# 🛍️ ShopEase – Enterprise Full Stack E-Commerce Platform
+# 🛍️ ShopEase – Enterprise Full Stack E-Commerce Platform.
 
 > Production-grade, full-stack digital commerce platform engineered with **React 18 (Vite + Tailwind CSS)** and **Java 21 + Spring Boot 3.3.3 (Spring Data JPA + Spring Security 6 + JJWT + OpenPDF Vector Invoices + MySQL 8.0 / H2)** *(with companion Node.js / Express backend)*.
 
